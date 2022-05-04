@@ -46,9 +46,9 @@ RSpec.describe Spree::Order do
         allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(true)
         order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
 
-        expect {
-          order.complete!
-        }.not_to have_enqueued_email(Spree::OrderMailer, 'confirm_email')
+        expect(Spree::OrderMailer).not_to receive(:confirm_email)
+
+        order.complete!
       end
     end
 
@@ -57,9 +57,9 @@ RSpec.describe Spree::Order do
         allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(false)
         order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
 
-        expect {
-          order.complete!
-        }.to have_enqueued_email(Spree::OrderMailer, 'confirm_email')
+        expect(Spree::OrderMailer).to receive(:confirm_email).and_call_original
+
+        order.complete!
       end
     end
   end
@@ -81,9 +81,9 @@ RSpec.describe Spree::Order do
         allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(true)
         order = create(:completed_order_with_totals)
 
-        expect {
-          order.canceled_by(create(:user))
-        }.not_to have_enqueued_email(Spree::OrderMailer, 'cancel_email')
+        expect(Spree::OrderMailer).not_to receive(:cancel_email)
+
+        order.canceled_by(create(:user))
       end
     end
 
@@ -92,9 +92,9 @@ RSpec.describe Spree::Order do
         allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(false)
         order = create(:completed_order_with_totals)
 
-        expect {
-          order.canceled_by(create(:user))
-        }.to have_enqueued_email(Spree::OrderMailer, 'cancel_email')
+        expect(Spree::OrderMailer).to receive(:cancel_email).and_call_original
+
+        order.canceled_by(create(:user))
       end
     end
   end
