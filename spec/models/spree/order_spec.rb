@@ -41,25 +41,27 @@ RSpec.describe Spree::Order do
       end
     end
 
-    context 'when disable_builtin_emails is true' do
-      it 'does not send the confirmation email' do
-        allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(true)
-        order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
+    unless defined?(Spree::OrderMailerSubscriber)
+      context 'when disable_builtin_emails is true' do
+        it 'does not send the confirmation email' do
+          allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(true)
+          order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
 
-        expect(Spree::OrderMailer).not_to receive(:confirm_email)
+          expect(Spree::OrderMailer).not_to receive(:confirm_email)
 
-        order.complete!
+          order.complete!
+        end
       end
-    end
 
-    context 'when disable_builtin_emails is false' do
-      it 'sends the confirmation email' do
-        allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(false)
-        order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
+      context 'when disable_builtin_emails is false' do
+        it 'sends the confirmation email' do
+          allow(SolidusTracking.configuration).to receive(:disable_builtin_emails).and_return(false)
+          order = Spree::TestingSupport::OrderWalkthrough.up_to(:payment)
 
-        expect(Spree::OrderMailer).to receive(:confirm_email).and_call_original
+          expect(Spree::OrderMailer).to receive(:confirm_email).and_call_original
 
-        order.complete!
+          order.complete!
+        end
       end
     end
   end
